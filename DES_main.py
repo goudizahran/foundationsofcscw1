@@ -5,8 +5,8 @@
 
 # main file 
 
-from 2_DES_encode import des_encrypt_block
-from 3_DES_decode import des_decrypt_block
+from DES_encode import des_encrypt_block
+from DES_decode import des_decrypt_block
 
 def hex64(x):
     return f"0x{x:016X}"
@@ -22,7 +22,7 @@ def main():
     print("key:         ", hex64(key))
     print("plaintext:   ", hex64(plaintext))
     print("ciphertext:  ", hex64(ciphertext))
-    print("decrypted text:   ", hex64(decrypted))
+    print("decrypted text:   ", hex64(decrypted_text))
 
-if __name__ == "__4_DES_main__":
+if __name__ == "__DES_main__":
     main()

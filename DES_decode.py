@@ -3,15 +3,15 @@
 # Goudi Zahran 2400725
 
 
-# DES encoding (encryption)
+# DES decoding (decryption)
 
-from 1_DES_tools import generate_subkeys
-from 1_DES_tools import IP, FP, E, SBOX, P
-from 1_DES_tools import feistel, int_to_bits, bits_to_int, permute
+from DES_tools import generate_subkeys
+from DES_tools import IP, FP, E, SBOX, P
+from DES_tools import feistel, int_to_bits, bits_to_int, permute
 
 
-def des_encrypt_block(block64, key64):
-    # encode a single 64-bit block using DES
+def des_decrypt_block(block64, key64):
+    # decrypt a single 64-bit block using DES
     bits = int_to_bits(block64, 64)
     permuted_bits = permute(bits, IP)
 
@@ -19,7 +19,7 @@ def des_encrypt_block(block64, key64):
     subkeys = generate_subkeys(key64)
 
     for i in range(16):
-        f_out = feistel(R, subkeys[i])
+        f_out = feistel(R, subkeys[15 - i])
         L, R = R, [L[j] ^ f_out[j] for j in range(32)]
 
     final_bits = permute(R + L, FP)
