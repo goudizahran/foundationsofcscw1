@@ -140,3 +140,71 @@ PC2 = [
 
 # number of left shifts per round
 SHIFTS = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
+
+
+
+# ---------- helpers ----------
+def int_to_bits(x, n):
+    return [(x >> (n-1-i)) & 1 for i in range(n)]
+
+
+def bits_to_int(bits):
+    v = 0
+    for b in bits:
+        v = (v << 1) | b
+    return v
+
+
+def permute(b, table):
+    return [b[i-1] for i in table]
+
+
+def left_rotate(b, n):
+    return b[n:] + b[:n]
+
+
+
+# ---------- Key Schedule ----------
+def generate_subkeys(key64):
+    key_bits = int_to_bits(key64, 64)
+    key56 = permute(key_bits, PC1)
+    C = key56[:28]
+    D = key56[28:]
+    subkeys = []
+    for s in SHIFTS:
+        C = left_rotate(C, s)
+        D = left_rotate(D, s)
+        subkeys.append(permute(C + D, PC2))
+    return subkeys
+
+
+
+# ---------- Feistel Round ----------
+def sbox_substitute(bits48):
+    out = []
+    for i in range(8):
+        chunk = bits48[i*6:(i+1)*6]
+        row = (chunk[0] << 1) | chunk[5]
+        col = (chunk[1] << 3) | (chunk[2] << 2) | (chunk[3] << 1) | chunk[4]
+        val = SBOX[i][row][col]
+        out += int_to_bits(val, 4)
+    return out
+
+
+def feistel(R, subkey):
+    expanded = permute(R, E)
+    xored = [expanded[i] ^ subkey[i] for i in range(48)]
+    sboxed = sbox_substitute(xored)
+    return permute(sboxed, P)
+
+
+
+
+
+
+
+
+
+
+
+
