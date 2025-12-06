@@ -132,13 +132,10 @@ SHIFTS = [1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1]
 
 # ------------ shared helper functions ------------
 def int_to_bits(x, n):
-    return [(x >> (n - 1 - i)) & 1 for i in range(n)]
+    return [int(b) for b in f"{x:0{n}b}"]
 
 def bits_to_int(bits):
-    v = 0
-    for b in bits:
-        v = (v << 1) | b
-    return v
+    return int("".join(str(b) for b in bits), 2)
 
 def permute(bits, table):
     return [bits[i - 1] for i in table]
