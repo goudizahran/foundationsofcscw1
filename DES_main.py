@@ -21,6 +21,8 @@ def pkcs5_pad(data):
 def main():
     # generate a random 64-bit key
     key = random.getrandbits(64)
+    iv = random.getrandbits(64)   # initilization vector for CBC
+    previous_block = iv 
 
     while True:
         plaintext_str = input("please enter the message you'd like to encrypt: ")
@@ -42,13 +44,28 @@ def main():
     ciphertext_blocks = []
     decrypted_blocks = []
 
+    # CBC encryption 
     for block in blocks:
         block_int = int.from_bytes(block, byteorder="big")
+
+        block_int ^= previous_block  # CBC XOR
+
         encrypted_int = des_encrypt_block(block_int, key)
-        decrypted_int = des_decrypt_block(encrypted_int, key)
 
         ciphertext_blocks.append(encrypted_int)
+        previous_block = encrypted_int  # CBC chaining 
+
+    # CBC decryption
+    previous_block = iv   # reset initilization vector
+
+    for c in ciphertext_blocks:
+        decrypted_int = des_decrypt_block(c, key)
+
+        decrypted_int ^= previous_block  # CBC XOR 
+
         decrypted_blocks.append(decrypted_int)
+        previous_block = c  # CBC chaining
+
 
     # convert decrypted integers back to bytes
     decrypted_bytes = b"".join(
@@ -60,6 +77,7 @@ def main():
     decrypted_bytes = decrypted_bytes[:-pad_len]
 
     print("key:           ", hex64(key))
+    print("IV:            ", hex64(iv))
     print("plaintext:     ", plaintext_str)
     print("cipher (hex):  ", [hex64(c) for c in ciphertext_blocks])
     print("decrypted:     ", decrypted_bytes.decode("ascii"))
