@@ -5,8 +5,8 @@
 # test file 
 # this file is not meant for users and is not part of the DES implementation, it is a way for me to ensure the program remains functional as i make edits 
 
-from DES_encode import des_encrypt_block
-from DES_decode import des_decrypt_block
+from DES_encrypt import des_encrypt_block
+from DES_decrypt import des_decrypt_block
 import random
 
 def testing():
