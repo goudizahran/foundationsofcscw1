@@ -79,7 +79,7 @@ def main():
     print("key:           ", hex64(key))
     print("IV:            ", hex64(iv))
     print("plaintext:     ", plaintext_str)
-    print("cipher (hex):  ", [hex64(c) for c in ciphertext_blocks])
+    print("ciphertext(hex):  ", [hex64(c) for c in ciphertext_blocks])
     print("decrypted:     ", decrypted_bytes.decode("ascii"))
 
 if __name__ == "__main__":
