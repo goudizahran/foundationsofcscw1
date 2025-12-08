@@ -4,8 +4,8 @@
 
 # main file 
 
-from DES_encode import des_encrypt_block
-from DES_decode import des_decrypt_block
+from DES_encrypt import des_encrypt_block
+from DES_decrypt import des_decrypt_block
 import random
 
 def hex64(x):
