@@ -11,7 +11,7 @@ import random
 def hex64(x):
     return f"0x{x:016X}"
 
-# PKCS#5 padding
+#  padding (PKCS#5)
 def pkcs5_pad(data):
     pad_len = 8 - (len(data) % 8)
     if pad_len == 0:
@@ -39,14 +39,14 @@ def main():
     padded_bytes = pkcs5_pad(plaintext_bytes)
 
     # split into 8-byte (64-bit) blocks
-    blocks = [padded_bytes[i:i+8] for i in range(0, len(padded_bytes), 8)]
+    blocks = [padded_bytes[i:i+8] for i in range(0, len(padded_bytes), 8)] # slicing 
 
     ciphertext_blocks = []
     decrypted_blocks = []
 
     # CBC encryption 
     for block in blocks:
-        block_int = int.from_bytes(block, byteorder="big")
+        block_int = int.from_bytes(block, byteorder="big") # bite order is big endian so it starts from the MSB 
 
         block_int ^= previous_block  # CBC XOR
 

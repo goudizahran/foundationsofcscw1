@@ -132,13 +132,13 @@ SHIFTS = [1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1]
 
 # ------------ shared helper functions ------------
 def int_to_bits(x, n):
-    return [int(b) for b in f"{x:0{n}b}"]
+    return [int(b) for b in f"{x:0{n}b}"] #padding with zeroes ensures python does not drop leading zeroes, therefor maintaining the bit length needed
 
 def bits_to_int(bits):
     return int("".join(str(b) for b in bits), 2)
 
 def permute(bits, table):
-    return [bits[i - 1] for i in table]
+    return [bits[i - 1] for i in table] #permute bits according to DES tables (1-indexed)
 
 def left_rotate(lst, n):
     return lst[n:] + lst[:n]
@@ -146,9 +146,10 @@ def left_rotate(lst, n):
 
 # ------------ key schedule ------------
 def generate_subkeys(key64):
-    key_bits = int_to_bits(key64, 64)
-    key56 = permute(key_bits, PC1)
+    key_bits = int_to_bits(key64, 64) #convert the randomly generated key into bits
+    key56 = permute(key_bits, PC1) #apply PC1 to get the 56-bit effective key 
 
+    #split into two halves
     C = key56[:28]
     D = key56[28:]
 
@@ -156,7 +157,7 @@ def generate_subkeys(key64):
     for shift in SHIFTS:
         C = left_rotate(C, shift)
         D = left_rotate(D, shift)
-        subkeys.append(permute(C + D, PC2))
+        subkeys.append(permute(C + D, PC2)) #join the halves back together, then apply PC2 to form the 48-bit subkey, then add it as an element in the list of subkeys
 
     return subkeys
 
@@ -166,14 +167,14 @@ def sbox_substitute(bits48):
     out = []
     for i in range(8):
         block = bits48[i*6:(i+1)*6]
-        row = (block[0] << 1) | block[5]
-        col = (block[1] << 3) | (block[2] << 2) | (block[3] << 1) | block[4]
+        row = (block[0] << 1) | block[5] # outer bits form row index (0–3), block[0]*2^1 OR block[5] 
+        col = (block[1] << 3) | (block[2] << 2) | (block[3] << 1) | block[4] # inner 4 bits form column index (0–15), block[1]*2^3 OR block[2]*2^2 OR block[3]*2^1
         val = SBOX[i][row][col]
-        out += int_to_bits(val, 4)
+        out += int_to_bits(val, 4) #combine each 4-bit S-box output to get 32-bits
     return out
 
 def feistel(R, subkey):
-    expanded = permute(R, E)
-    xored = [expanded[i] ^ subkey[i] for i in range(48)]
-    sboxed = sbox_substitute(xored)
-    return permute(sboxed, P)
+    expanded = permute(R, E) #apply the expansion permutation to the right half of the block so it can be combined with the subkey (they must be the same size)
+    xored = [expanded[i] ^ subkey[i] for i in range(48)] #XOR with the subkey
+    sboxed = sbox_substitute(xored) #apply the S-boxes to get 32 bits back
+    return permute(sboxed, P) # apply P permutation
